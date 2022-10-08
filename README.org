@@ -1,0 +1,12 @@
+#+title: Pitchfork album similarity search
+#+author: Christoffer Arvidsson
+
+* Pitchfork album similarity search
+A prototype for searching for albums with text. The search currently
+uses sentences from pitchfork reviews and a sentence transformer
+embedding model to embed each sentence. For ease of use, FAISS is used
+for nearest-neighbor search, although this is so far just an
+exhaustive search.
+
+Improvements:
+- Aggregate embeddings for an entire review instead of per sentence search
