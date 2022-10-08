@@ -24,6 +24,19 @@ def execute_query(connection, query):
     except Error as e:
         logging.error(f"Query failed with error: {e}")
 
+def execute_get_query(connection, query):
+    """Execute SQL query."""
+    cursor = connection.cursor()
+    try:
+        cursor.execute(query)
+        result = cursor.fetchall()
+        logging.info("Query successfully")
+    except Error as e:
+        logging.error(f"Query failed with error: {e}")
+
+    return result
+
+
 def execute_many_query(connection, query, records):
     """Execute query across many records."""
     cursor = connection.cursor()
@@ -63,7 +76,7 @@ def get_documents_from_sentence_ids(connection, sent_ids):
     query = """
     SELECT sentences.*, documents.link
     FROM sentences
-    INNER JOIN documents ON sentences.doc_id=documents.doc_id
+    FULL JOIN documents ON sentences.doc_id=documents.doc_id
     WHERE sentences.sent_id IN (%s)
     """ % ",".join("?" * len(sent_ids))
 
@@ -73,6 +86,7 @@ def get_documents_from_sentence_ids(connection, sent_ids):
         result = cursor.fetchall()
     except Error as e:
         logging.error(f"Could not select {sent_ids} due to error: {e}")
+
 
     return result
 
