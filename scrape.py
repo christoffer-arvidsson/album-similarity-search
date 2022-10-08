@@ -66,7 +66,7 @@ def main():
         pass
 
     with open("data/album_metadata.json", "w") as file_handle:
-        json.dump(albums, file_handle)
+        json.dump(albums, file_handle, indent=2)
 
 
 
