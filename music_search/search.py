@@ -27,6 +27,29 @@ class NearestNeighbor:
 
         self.embedding_model = SentenceTransformer("all-mpnet-base-v2")
 
+    def _format_records(self, records: List[Dict], similarities: np.ndarray, search_ids: np.ndarray):
+        # Database hits are ordered by sentence id, which correspond
+        # to search_index. Therefore sort the search indices
+
+        (sent_ids, doc_ids, sentences, titles) = zip(*records)
+
+        sorted_indices = np.argsort(search_ids)
+        sorted_similarites = similarities[sorted_indices]
+        sorted_indices = search_ids[sorted_indices]
+
+        records = list(
+            sorted(
+                zip(sorted_similarites, sorted_indices, sent_ids, doc_ids, sentences, titles),
+                key=lambda d: d[0],
+                reverse=True
+            )
+        )
+
+        keys = ["similarity", "index_id", "sent_id", "doc_id", "review", "title"]
+        records = [dict(zip(keys, values)) for values in records]
+
+        return records
+
     def sent_tokenize(self, text: str) -> List[str]:
         return nltk.sent_tokenize(text)
 
@@ -61,18 +84,18 @@ class NearestNeighbor:
             LOG.info(f"Writing index to {self._index_path}")
             self.write()
         
-    def search(self, text, k=1):
+    def search(self, text: str, k=1):
         sentences = self.sent_tokenize(text)
 
         embeddings = self.embedding_model.encode(sentences)
         faiss.normalize_L2(embeddings)
         embeddings = np.mean(embeddings, axis=0)[None, :]
-        distances, indices = self.index.search(embeddings, k=k+1)
+        similarities, search_ids = self.index.search(embeddings, k=k+1)
 
-        # Connect to the database
         db_con = db.create_connection(self._db_path)
-        records = db.get_documents_from_sentence_ids(db_con, indices[0].tolist())
-        records = list(zip(distances[0], records))
+        recs = db.get_documents_from_sentence_ids(db_con, search_ids[0].tolist())
+        records = self._format_records(recs, similarities[0], search_ids[0])
+
         db_con.close()
 
         return records
