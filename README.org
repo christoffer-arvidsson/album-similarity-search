@@ -9,3 +9,5 @@ exhaustive search.
 
 Improvements:
 - Aggregate embeddings for an entire review instead of per sentence search
+- Finetune sentence transformer
+- Asymmetric vs symmetric search, ie. having a short search query matching against long targets would be assymetric and is what probably want here.
