@@ -10,7 +10,7 @@ from tqdm import trange, tqdm
 BASE_URL = "https://www.pitchfork.com"
 
 # 12 albums per page
-N_PAGES = 10
+N_PAGES = 100
 N_ALBUMS = N_PAGES * 12
 
 def parse_album(album_href: str):

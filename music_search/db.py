@@ -14,6 +14,7 @@ def create_connection(path):
 
     return connection
 
+
 def execute_query(connection, query):
     """Execute SQL query."""
     cursor = connection.cursor()
@@ -23,6 +24,7 @@ def execute_query(connection, query):
         logging.info("Query successfully")
     except Error as e:
         logging.error(f"Query failed with error: {e}")
+
 
 def execute_get_query(connection, query):
     """Execute SQL query."""
@@ -47,6 +49,7 @@ def execute_many_query(connection, query, records):
     except Error as e:
         logging.error(f"Query failed with error: {e}")
 
+
 def create_tables(connection):
     sent_query = """
     CREATE TABLE IF NOT EXISTS sentences (
@@ -66,9 +69,11 @@ def create_tables(connection):
     execute_query(connection, sent_query)
     execute_query(connection, doc_query)
 
+
 def drop_table(connection, table_name):
     query = f"DROP TABLE {table_name}"
     execute_query(connection, query)
+
 
 def get_documents_from_sentence_ids(connection, sent_ids):
     cursor = connection.cursor()
@@ -76,9 +81,11 @@ def get_documents_from_sentence_ids(connection, sent_ids):
     query = """
     SELECT sentences.*, documents.link
     FROM sentences
-    FULL JOIN documents ON sentences.doc_id=documents.doc_id
+    INNER JOIN documents ON sentences.doc_id=documents.doc_id
     WHERE sentences.sent_id IN (%s)
-    """ % ",".join("?" * len(sent_ids))
+    """ % ",".join(
+        "?" * len(sent_ids)
+    )
 
     result = None
     try:
@@ -87,14 +94,15 @@ def get_documents_from_sentence_ids(connection, sent_ids):
     except Error as e:
         logging.error(f"Could not select {sent_ids} due to error: {e}")
 
-
     return result
+
 
 def insert_sentences(connection, sent_ids, doc_ids, sentences):
     add_sent_query = "INSERT INTO sentences VALUES(?,?,?);"
     records = list(zip(sent_ids, doc_ids, sentences))
 
     execute_many_query(connection, add_sent_query, records)
+
 
 def insert_documents(connection, doc_ids, doc_paths):
     add_docs_query = "INSERT INTO documents VALUES(?,?);"

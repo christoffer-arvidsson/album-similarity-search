@@ -65,9 +65,9 @@ soupsieve==2.3.2.post1
 starlette==0.20.4
 threadpoolctl==3.1.0
 tokenizers==0.12.1
-torch==1.9.0+cu111
-torchaudio==0.9.0
-torchvision==0.10.0+cu111
+torch
+torchaudio
+torchvision
 tqdm==4.64.1
 transformers==4.22.2
 typing_extensions==4.4.0
