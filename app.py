@@ -1,25 +1,25 @@
-
 from typing import List
+
 import gradio as gr
-from music_search.search import NearestNeighbor
+
+from music_search.search import Searcher
 from music_search.util import get_config
 
-
 config = get_config("configs/default.yaml")
-nn = NearestNeighbor(config.index_path, config.db_path, read_index=True)
+nn = Searcher(config.index_path, config.db_path, read_index=True)
 k = 8
 
+
 def search(album_description: str) -> List[str]:
-    records = nn.search(album_description, k=8)
+    records = nn.search(album_description, num_neighbors=8)
     output = []
     for i, record in enumerate(records):
-        print(record)
-        score, index_id, sent_id, doc_id, review, title = record.values()
+        metadata = record.album_metadata
         markdown = (
-            f"### {i+1} - {title}\n"
-            f"score: {score:.2f} - iid: {index_id} - sent_id: {sent_id} - doc_id: {doc_id}\n"
+            f"### {i+1}: {metadata['artist']} - {metadata['title']} | {metadata['genres']}\n"
+            f"score: {record.score:.3f} | \n"
             "\n"
-            f"> {review}"
+            f"> {record.paragraph}"
         )
         output.append(markdown)
 

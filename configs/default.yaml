@@ -1,3 +1,2 @@
-db_path: "data/db.sqlite"
-dataset_path: "data/album_metadata.json"
+db_path: "data/albums.db"
 index_path: "data/search.index"
